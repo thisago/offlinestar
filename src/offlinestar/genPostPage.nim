@@ -27,18 +27,19 @@ proc genPage*(post: StarPost): string =
               br()
               text post.description
               br()
-              if videoUrl != videoFile:
+              if videoUrl.len > 0 and videoUrl != videoFile:
                 br()
                 p(style = style({color: "red"})):
                   text "Video is remote, please download it to watch offline!"
         tdiv(class = "post-uploads for-youtube")
-        tdiv(data-identifier = "post-782815-uploads", data-view = "app#ajax_container", data-autoload = "false", class = "post-uploads", data-url = "/posts/782815/uploads"):
-          tdiv(class = "uploads"):
-            video(controls = "on", src = videoUrl, style = style({maxWidth: "100%"}))
+        if videoUrl.len > 0:
+          tdiv(class = "post-uploads"):
+            tdiv(class = "uploads"):
+              video(controls = "on", src = videoUrl, style = style({maxWidth: "100%"}))
         tdiv(class = "post_form-uploading")
     tdiv(class = "post-edit_form")
     tdiv(class = "post-actions"):
-      tdiv(data-view = "app#ajax_container", class = "reactions for-post"):
+      tdiv(class = "reactions for-post"):
         tdiv(class = "reaction is-like"):
           italic(class = "md_icon is-thumb_up"):
             svg(viewBox = "0 0 24 24", width = "24", xmlns = "http://www.w3.org/2000/svg", height = "24"):
@@ -47,7 +48,7 @@ proc genPage*(post: StarPost): string =
             text "Like"
           span(class = "reaction-counter"):
             text $post.likes
-        tdiv(class = "reaction is-dislike", data-url = "/posts/782815/toggle_dislike", data-role = "ajax_container-ajax_button"):
+        tdiv(class = "reaction is-dislike"):
           italic(class = "md_icon is-thumb_down"):
             svg(viewBox = "0 0 24 24", width = "24", xmlns = "http://www.w3.org/2000/svg", height = "24"):
               path(d = "M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v1.91l.01.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z")

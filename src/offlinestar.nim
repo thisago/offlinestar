@@ -1,4 +1,5 @@
-from std/os import fileExists, dirExists, createDir, setCurrentDir, execShellCmd
+from std/os import fileExists, dirExists, createDir, setCurrentDir, execShellCmd,
+                    moveFile
 from std/strformat import fmt, `&`
 from std/json import `%`, `%*`, `$`, parseJson, to
 
@@ -24,7 +25,12 @@ proc extract(star, cookieFile, outDir: string): int =
 
 proc downloadFile(curl, file, dest: string): bool =
   ## Download the `file` to `dest` using curl
-  execShellCmd(&"{curl} \"{file}\" -o \"{dest}\"") == 0
+  const tmpExt = ".tmp"
+  when defined unix:
+    const mvCmd = "mv" 
+  elif defined windows:
+    const mvCmd = "move" 
+  result = execShellCmd(&"{curl} \"{file}\" -o \"{dest}{tmpExt}\" && {mvCmd} {dest}{tmpExt} {dest}") == 0
 
 proc download(dirs: seq[string]; curl = "curl"): int =
   ## Downloads all videos of Subscribestar account
@@ -38,12 +44,13 @@ proc download(dirs: seq[string]; curl = "curl"): int =
       let postDir = post.name.escapeFs
       createDir postDir
       setCurrentDir postDir
-      stdout.write fmt"Downloading '{post.name}'..."
-      if not curl.downloadFile(post.videoUrl, videoFile):
-        echo fmt"Error when downloading '{post.name}'"
-        return 1
+      if fileExists videoFile:
+        echo fmt"Skipping '{post.name}'"
       else:
-        echo " Success!"
+        echo fmt"Downloading '{post.name}'..."
+        if not curl.downloadFile(post.videoUrl, videoFile):
+          echo fmt"Error when downloading '{post.name}'"
+          return 1
       setCurrentDir ".."
 
 proc genPages(dirs: seq[string]): int =
@@ -57,6 +64,7 @@ proc genPages(dirs: seq[string]): int =
     htmlFile.writeFile data.genPage
     for post in data.posts:
       let postDir = post.name.escapeFs
+      createDir postDir
       setCurrentDir postDir
       htmlFile.writeFile post.genPage
       setCurrentDir ".."
