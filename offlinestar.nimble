@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.0"
+version       = "1.0.0"
 author        = "Thiago Navarro"
 description   = "View the Subscribestar content offline!"
 license       = "MIT"
@@ -15,3 +15,4 @@ requires "nim >= 1.6.4"
 requires "subscribestar"
 requires "cligen"
 requires "util"
+requires "karax"

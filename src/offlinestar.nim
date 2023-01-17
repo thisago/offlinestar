@@ -5,9 +5,9 @@ from std/json import `%`, `%*`, `$`, parseJson, to
 import pkg/subscribestar
 from pkg/util/forFs import escapeFs
 
-const
-  dataFile = "data.json"
-  videoFile = "video.mp4"
+import offlinestar/config
+import offlinestar/genPostPage
+import offlinestar/genIndexPage
 
 proc extract(star, cookieFile, outDir: string): int =
   ## Extracts the Subscribestar content
@@ -46,6 +46,21 @@ proc download(dirs: seq[string]; curl = "curl"): int =
         echo " Success!"
       setCurrentDir ".."
 
+proc genPages(dirs: seq[string]): int =
+  ## Generates a Subscribestar page clone to view the downloaded files
+  for dir in dirs:
+    if not dirExists dir:
+      echo "Error, dir not exists"
+      return 1
+    setCurrentDir dir
+    let data = dataFile.readFile.parseJson.to Star
+    htmlFile.writeFile data.genPage
+    for post in data.posts:
+      let postDir = post.name.escapeFs
+      setCurrentDir postDir
+      htmlFile.writeFile post.genPage
+      setCurrentDir ".."
+
 when isMainModule:
   import pkg/cligen
   dispatchMulti([
@@ -56,4 +71,6 @@ when isMainModule:
     }
   ], [
     download,
+  ], [
+    genPages
   ])
