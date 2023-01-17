@@ -46,11 +46,13 @@ proc download(dirs: seq[string]; curl = "curl"): int =
       setCurrentDir postDir
       if fileExists videoFile:
         echo fmt"Skipping '{post.name}'"
-      else:
+      elif post.videoUrl.len > 0:
         echo fmt"Downloading '{post.name}'..."
         if not curl.downloadFile(post.videoUrl, videoFile):
           echo fmt"Error when downloading '{post.name}'"
           return 1
+      else:
+        echo fmt"No video for '{post.name}'"
       setCurrentDir ".."
 
 proc genPages(dirs: seq[string]): int =

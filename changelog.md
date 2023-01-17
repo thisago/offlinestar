@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.1.1 (Tuesday 17 Jan 2023)
+
+- Check if there's a video file to download
+
+---
+
 ## Version 1.1.0 (Tuesday 17 Jan 2023)
 
 - Add video in page only if video exists
